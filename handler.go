@@ -104,7 +104,7 @@ func (h *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		http.NotFound(w, r)
 		return
 	}
-
+	subpath = strings.Split(subpath, "/")[0]
 	w.Header().Set("Cache-Control", h.cacheControl)
 	if err := vanityTmpl.Execute(w, struct {
 		Import  string
@@ -151,9 +151,6 @@ func (h *handler) Host(r *http.Request) string {
 var indexTmpl = template.Must(template.New("index").Parse(`<!DOCTYPE html>
 <html>
 <h1>{{.Host}}</h1>
-<ul>
-{{range .Handlers}}<li><a href="https://pkg.go.dev/{{.}}">{{.}}</a></li>{{end}}
-</ul>
 </html>
 `))
 
@@ -161,12 +158,10 @@ var vanityTmpl = template.Must(template.New("vanity").Parse(`<!DOCTYPE html>
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
-<meta name="go-import" content="{{.Import}} {{.VCS}} {{.Repo}}">
-<meta name="go-source" content="{{.Import}} {{.Display}}">
-<meta http-equiv="refresh" content="0; url=https://pkg.go.dev/{{.Import}}/{{.Subpath}}">
+<meta name="go-import" content="{{.Import}}/{{.Subpath}} {{.VCS}} {{.Repo}}/{{.Subpath}}">
+<meta name="go-source" content="{{.Import}}/{{.Subpath}} {{.Display}}/{{.Subpath}}">
 </head>
 <body>
-Nothing to see here; <a href="https://pkg.go.dev/{{.Import}}/{{.Subpath}}">see the package on pkg.go.dev</a>.
 </body>
 </html>`))
 
